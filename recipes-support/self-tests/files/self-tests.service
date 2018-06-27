@@ -5,7 +5,7 @@ Requires=dev-ttyGS0.device
 
 [Service]
 Type=oneshot
-ExecStart=/sbin/self-tests
+ExecStart=/sbin/self-tests.py
 
 [Install]
 WantedBy=multi-user.target

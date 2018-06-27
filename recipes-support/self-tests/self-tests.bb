@@ -4,24 +4,38 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI += "\
     file://self-tests.service \
+    file://crypto_chip_test.c \
+    file://self-tests.py \
     "
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/files/:"
 
 SYSTEMD_SERVICE_${PN} = "self-tests.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_AUTO_RESTART = "false"
 
-RDEPENDS_${PN} = "systemd"
-DEPENDS = "systemd"
+RDEPENDS_${PN} = "systemd python openssl-atecc508a"
+DEPENDS = "systemd python openssl-atecc508a"
 
 inherit systemd
 
 S = "${WORKDIR}"
 
+INC_DIRS = "-I${STAGING_INCDIR}/ateccssl"
+LIB_DIRS = "-L${STAGING_LIBDIR}"
+LIBS = "-lateccssl"
+
+do_compile() {
+    ${CC} ${CFLAGS} ${LDFLAGS} ${LIB_DIRS} ${INC_DIRS} ${S}/crypto_chip_test.c -o crypto_chip_test ${LIBS}
+}
+
 do_install() {
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${S}/self-tests.service ${D}${systemd_unitdir}/system
 
+    install -d ${D}${base_sbindir}
+    install -c -m 0755 ${B}/crypto_chip_test ${D}${base_sbindir}
+    install -c -m 0755 ${S}/self-tests.py ${D}${base_sbindir}
 }
 
 systemd_postinst() {
@@ -41,3 +55,5 @@ fi
 }
 
 FILES_${PN} += "${base_libdir}/systemd/system/self-tests.service"
+FILES_${PN} += "${base_sbindir}/crypto_chip_test"
+FILES_${PN} += "${base_sbindir}/self-tests.py"
