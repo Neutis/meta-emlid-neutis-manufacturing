@@ -1,0 +1,11 @@
+[Unit]
+Description=Neutis N5 self-tester
+After=dev-ttyGS0.device
+Requires=dev-ttyGS0.device
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/self-tests
+
+[Install]
+WantedBy=multi-user.target
