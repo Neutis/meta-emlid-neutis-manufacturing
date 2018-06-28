@@ -88,19 +88,51 @@ def run_self_tests():
 
 
 def test_crypto_chip():
-    _, result = get_cryptochip_public_key()
+    slept = 0
+    sleep_step = 0.1
+    sleep_max_steps = 1.0
+    result = False
+
+    while True:
+        _, result = get_cryptochip_public_key()
+
+        if result:
+            break
+
+        if slept >= sleep_max_steps:
+            logger.error("Timed out waiting for crypto chip")
+            return False
+
+        time.sleep(sleep_step)
+        slept += sleep_step
+
     return result
 
 
 def test_wifi():
     global wifi_mac_address
 
-    try:
-        wifi_mac_address = subprocess.check_output(
-            "ifconfig | grep HWaddr | grep wlan0 | awk '{print $5}'",
-            shell=True).strip("\n")
-    except Exception as error:
-        logger.error(error)
+    slept = 0
+    sleep_step = 0.1
+    sleep_max_steps = 1.0
+
+    while True:
+        try:
+            wifi_mac_address = subprocess.check_output(
+                "ifconfig | grep HWaddr | grep wlan0 | awk '{print $5}'",
+                shell=True).strip("\n")
+
+            if wifi_mac_address:
+                break
+        except Exception:
+            pass
+
+        if slept >= sleep_max_steps:
+            logger.error("Timed out waiting for crypto chip")
+            return False
+
+        time.sleep(sleep_step)
+        slept += sleep_step
 
     return bool(wifi_mac_address)
 
@@ -118,7 +150,7 @@ def test_bluetooth():
         try:
             bt_mac_address = subprocess.check_output(
                 "hcitool dev | cut -sf3", shell=True).strip("\n")
-            if bool(bt_mac_address):
+            if bt_mac_address:
                 break
         except Exception:
             pass

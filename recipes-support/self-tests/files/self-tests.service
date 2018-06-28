@@ -1,6 +1,7 @@
 [Unit]
 Description=Neutis N5 self-tester
 After=dev-ttyGS0.device
+After=bluetooth.service NetworkManager.service serial_number.service
 Requires=dev-ttyGS0.device
 
 [Service]
