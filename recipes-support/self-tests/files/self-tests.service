@@ -6,6 +6,7 @@ Requires=dev-ttyGS0.device
 [Service]
 Type=oneshot
 ExecStart=/sbin/self-tests.py
+ExecStart=/bin/systemctl disable self-tests && sync
 
 [Install]
 WantedBy=multi-user.target
