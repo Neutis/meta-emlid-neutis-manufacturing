@@ -14,8 +14,10 @@ SYSTEMD_SERVICE_${PN} = "self-tests.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_AUTO_RESTART = "false"
 
-RDEPENDS_${PN} = "systemd python python-serial openssl-atecc508a serial-number"
-DEPENDS = "systemd python python-serial openssl-atecc508a serial-number"
+RDEPENDS_${PN} = "systemd python python-pyserial openssl-atecc508a serial-number"
+DEPENDS = "systemd python python-pyserial openssl-atecc508a serial-number"
+
+INSANE_SKIP_${PN} = "file-rdeps"
 
 inherit systemd
 
