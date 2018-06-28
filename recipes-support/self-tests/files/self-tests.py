@@ -10,13 +10,10 @@
 #  Egor Fedorov <egor.fedorov@emlid.com>, 2018
 
 import time
+import serial
 import logging
 import subprocess
 import collections
-import serial
-
-from sysdmanager import SystemdManager
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -88,25 +85,24 @@ def test_bluetooth():
     slept = 0
     sleep_step = 0.25
     sleep_max_steps = 3 * (1.0 / sleep_step)
-    sysd = SystemdManager()
 
     logger.debug("Waiting for bluetooth.target")
 
-    while not sysd.is_active("bluetooth.target"):
-        time.sleep(sleep_step)
-        slept += sleep_step
+    while True:
+        try:
+            bt_mac_address = subprocess.check_output(
+                "hcitool dev | cut -sf3", shell=True).strip("\n")
+            if bool(bt_mac_address):
+                break
+        except Exception:
+            pass
 
         if slept >= sleep_max_steps:
-            logger.error("Timed out waiting for bluetooth target")
+            logger.error("Timed out waiting for bluetooth device")
             return False
 
-    logger.debug("bluetooth.target is ready, trying read BT mac address")
-
-    try:
-        bt_mac_address = subprocess.check_output(
-            "hcitool dev | cut -sf3", shell=True).strip("\n")
-    except Exception as error:
-        logger.error(error)
+        time.sleep(sleep_step)
+        slept += sleep_step
 
     return bool(bt_mac_address)
 
