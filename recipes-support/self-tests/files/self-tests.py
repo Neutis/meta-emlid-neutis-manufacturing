@@ -265,10 +265,22 @@ def send_to_serial(test_results_string):
     end_mess = "E_R_M"
     summary = test_results_string
 
-    results = "{0}{1};;serial-number:{2};;qr-code-text:{3}{4}".format(
+    if device_serial_number:
+        serial_number_key = "serial-number"
+    else:
+        serial_number_key = "None"
+
+    if qr_code_text:
+        qr_code_text_key = "qr-code-text"
+    else:
+        qr_code_text_key = "None"
+
+    results = "{0}{1};;{2}:{3};;{4}:{5}{6}".format(
         begin_mess,
         summary,
+        serial_number_key,
         device_serial_number,
+        qr_code_text_key,
         qr_code_text,
         end_mess)
 
