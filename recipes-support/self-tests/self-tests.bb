@@ -1,6 +1,6 @@
 DESCRIPTION = "Service & scripts to test Neutis N5 board"
-LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 SRC_URI += "\
     file://self-tests.service \
@@ -14,8 +14,8 @@ SYSTEMD_SERVICE_${PN} = "self-tests.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 SYSTEMD_AUTO_RESTART = "false"
 
-RDEPENDS_${PN} = "systemd python openssl-atecc508a"
-DEPENDS = "systemd python openssl-atecc508a"
+RDEPENDS_${PN} = "systemd python python-serial openssl-atecc508a"
+DEPENDS = "systemd python python-serial openssl-atecc508a"
 
 inherit systemd
 
