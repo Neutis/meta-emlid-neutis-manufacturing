@@ -51,15 +51,30 @@ bt_mac_address = None
 
 
 def get_serial_number():
-    try:
-        with open(SERIAL_NUMBER_PATH, "r") as serial_number_file:
-            serial_number = serial_number_file.readline()
+    slept = 0
+    sleep_step = 0.1
+    sleep_max_steps = 1.0
 
-        logger.debug("Reading serial number: {}".format(serial_number))
-        return serial_number
-    except IOError:
-        logger.exception("Could not read serial number")
-        return ""
+    while True:
+        try:
+            with open(SERIAL_NUMBER_PATH, "r") as serial_number_file:
+                serial_number = serial_number_file.readline()
+
+            logger.debug("Reading serial number: {}".format(serial_number))
+
+            if serial_number:
+                return serial_number
+        except Exception:
+            pass
+
+        if slept >= sleep_max_steps:
+            logger.exception("Could not read serial number")
+            break
+
+        time.sleep(sleep_step)
+        slept += sleep_step
+
+    return ""
 
 
 def get_qr_code_text(serial_number):
@@ -101,7 +116,7 @@ def test_crypto_chip():
 
         if slept >= sleep_max_steps:
             logger.error("Timed out waiting for crypto chip")
-            return False
+            break
 
         time.sleep(sleep_step)
         slept += sleep_step
@@ -129,7 +144,7 @@ def test_wifi():
 
         if slept >= sleep_max_steps:
             logger.error("Timed out waiting for crypto chip")
-            return False
+            break
 
         time.sleep(sleep_step)
         slept += sleep_step
@@ -144,8 +159,6 @@ def test_bluetooth():
     sleep_step = 0.25
     sleep_max_steps = 3 * (1.0 / sleep_step)
 
-    logger.debug("Waiting for bluetooth.target")
-
     while True:
         try:
             bt_mac_address = subprocess.check_output(
@@ -157,7 +170,7 @@ def test_bluetooth():
 
         if slept >= sleep_max_steps:
             logger.error("Timed out waiting for bluetooth device")
-            return False
+            break
 
         time.sleep(sleep_step)
         slept += sleep_step
