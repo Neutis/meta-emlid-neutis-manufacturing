@@ -103,51 +103,19 @@ def run_self_tests():
 
 
 def test_crypto_chip():
-    slept = 0
-    sleep_step = 0.1
-    sleep_max_steps = 1.0
-    result = False
-
-    while True:
-        _, result = get_cryptochip_public_key()
-
-        if result:
-            break
-
-        if slept >= sleep_max_steps:
-            logger.error("Timed out waiting for crypto chip")
-            break
-
-        time.sleep(sleep_step)
-        slept += sleep_step
-
+    _, result = get_cryptochip_public_key()
     return result
 
 
 def test_wifi():
     global wifi_mac_address
 
-    slept = 0
-    sleep_step = 0.1
-    sleep_max_steps = 1.0
-
-    while True:
-        try:
-            wifi_mac_address = subprocess.check_output(
-                "ifconfig | grep HWaddr | grep wlan0 | awk '{print $5}'",
-                shell=True).strip("\n")
-
-            if wifi_mac_address:
-                break
-        except Exception:
-            pass
-
-        if slept >= sleep_max_steps:
-            logger.error("Timed out waiting for crypto chip")
-            break
-
-        time.sleep(sleep_step)
-        slept += sleep_step
+    try:
+        wifi_mac_address = subprocess.check_output(
+            "ifconfig | grep HWaddr | grep wlan0 | awk '{print $5}'",
+            shell=True).strip("\n")
+    except Exception as error:
+        logger.error(error)
 
     return bool(wifi_mac_address)
 
@@ -155,32 +123,19 @@ def test_wifi():
 def test_bluetooth():
     global bt_mac_address
 
-    slept = 0
-    sleep_step = 0.25
-    sleep_max_steps = 3 * (1.0 / sleep_step)
-
-    while True:
-        try:
-            bt_mac_address = subprocess.check_output(
-                "hcitool dev | cut -sf3", shell=True).strip("\n")
-            if bt_mac_address:
-                break
-        except Exception:
-            pass
-
-        if slept >= sleep_max_steps:
-            logger.error("Timed out waiting for bluetooth device")
-            break
-
-        time.sleep(sleep_step)
-        slept += sleep_step
+    try:
+        bt_mac_address = subprocess.check_output(
+            "hcitool dev | cut -sf3", shell=True).strip("\n")
+    except Exception as error:
+        logger.error(error)
 
     return bool(bt_mac_address)
 
 
 class SelfTest(object):
 
-    max_attempts = 3
+    max_attempts = 10
+    attempt_step = 0.15
 
     starting_template = "Running {} test..."
     passed_template = "{} test passed"
@@ -201,6 +156,7 @@ class SelfTest(object):
 
         while not passed and attempts > 0:
             passed = self.test_method()
+            time.sleep(self.attempt_step)
             attempts -= 1
 
         if passed:
@@ -327,9 +283,6 @@ def send_to_serial(test_results_string):
 
 def main():
     device_info = run_self_tests()
-
-    print(device_info)
-
     send_to_serial(device_info["test_results_string"])
 
 
