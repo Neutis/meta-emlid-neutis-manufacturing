@@ -1,0 +1,13 @@
+[Unit]
+Description=Neutis N5 connectors tester
+After=getty.target
+After=getty@tty1.service
+After=self-tests.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/connector-tests.py
+ExecStart=/bin/systemctl disable connector-tests && /bin/sync
+
+[Install]
+WantedBy=multi-user.target
