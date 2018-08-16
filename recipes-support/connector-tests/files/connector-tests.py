@@ -1,18 +1,20 @@
 #!/usr/bin/python3
 
 import select
+import subprocess
+
 from systemd import journal
 
 
 HDMI_CONSOLE = '/dev/tty1'
 
 
-tests_list = {
-    'USB TOP': 'usb 4-1: new full-speed USB device number',
-    'USB BOTTOM': 'usb 3-1: new full-speed USB device number',
-    'MicroSD': 'mmc0: new high speed SDHC card',
-    'Ethernet': 'eth0: Link is Up'
-    }
+tests_list = [
+    ('USB TOP', 'usb 4-1: new high-speed USB device number'),
+    ('USB BOTTOM', 'usb 3-1: new high-speed USB device number'),
+    ('MicroSD', 'mmc0: new high speed SDHC card'),
+    ('Ethernet', 'eth0: Link is Up')
+]
 
 
 def print_hdmi(text):
@@ -48,13 +50,28 @@ def run_tests():
     j.wait_dev('fb0:  frame buffer device')
     print_hdmi('\nHDMI found')
 
-    for name, search_str in tests_list.items():
-        print_hdmi('Insert device into {}'.format(name))
+    for test in tests_list:
+        print_hdmi('Insert device into {}'.format(test[0]))
         print_hdmi('Waiting...')
-        j.wait_dev(search_str)
-        print_hdmi('{}: OK'.format(name))
+        j.wait_dev(test[1])
+        print_hdmi('{}: TRUE'.format(test[0]))
 
-    print_hdmi('All tests passed')
+    #  Camera test
+    cam_ret = "FALSE"
+
+    print_hdmi('Camera testing...')
+
+    try:
+        for i in range(5):
+            subprocess.check_call("fswebcam -d /dev/video0 -r 1280x720 /image.jpg && rm -f /image.jpg", shell=True)
+    except:
+        pass
+    else:
+        cam_ret = "TRUE"
+
+    print_hdmi('Camera: {}'.format(cam_ret))
+
+    print_hdmi('DONE!')
 
 
 if __name__ == '__main__':
