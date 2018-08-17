@@ -3,6 +3,7 @@
 import select
 import subprocess
 
+from time import sleep
 from systemd import journal
 
 
@@ -48,6 +49,7 @@ def run_tests():
 
     # Wait for HDMI connection
     j.wait_dev('fb0:  frame buffer device')
+    sleep(3)
     print_hdmi('\nHDMI found')
 
     for test in tests_list:
