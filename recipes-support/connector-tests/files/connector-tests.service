@@ -6,8 +6,8 @@ After=self-tests.service
 
 [Service]
 Type=oneshot
-ExecStart=/sbin/connector-tests.py
 ExecStart=/bin/bash -c 'systemctl disable connector-tests && sync'
+ExecStart=/sbin/connector-tests.py
 
 [Install]
 WantedBy=multi-user.target

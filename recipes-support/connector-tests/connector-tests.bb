@@ -12,8 +12,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files/:"
 SYSTEMD_SERVICE_${PN} = "connector-tests.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
-RDEPENDS_${PN} = "systemd python python3-systemd"
-DEPENDS = "systemd python python3-systemd"
+RDEPENDS_${PN} = "systemd python python3-systemd python3-pyalsaaudio"
+DEPENDS = "systemd python python3-systemd python3-pyalsaaudio"
 
 inherit systemd
 
