@@ -124,6 +124,7 @@ def test_bluetooth():
     global bt_mac_address
 
     try:
+        subprocess.check_output(["hciconfig", "hci0", "up"])
         bt_mac_address = subprocess.check_output(
             "hcitool dev | cut -sf3", shell=True).strip("\n")
     except Exception as error:
